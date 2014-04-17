@@ -19,7 +19,7 @@ class color:
 		except ValueError: pass
 	def reset():	# resets active color group to the master
 		color.active=list(color.list)
-	def setup():
+	def setup():	# initializes color
 		color.list=[]
 		print("Please input at least four colors in standard\n3 or 6 character HEX format (excluding #).\nWhen you are complete, please enter 0.")
 		while True:
@@ -33,55 +33,72 @@ class color:
 def docSpec():
 	# add argv-related conditionals that control file specifications
 	return open('triangle_%s.svg'%rbit(8),'w')
-class lookup:	# holds the lookup rules
-	def ullr(posX,posY):					# ORIENTATION 0 - ULLR
-		if posX==0 and posY!=0: 				# if against the wall...
-			tile.assign(0,posY,2) 				# 	set and purge lower
-			color.purge(0,posY-1,2)				# 	look up and purge lower
-			tile.assign(0,posY,1)				# 	set and purge upper
-		elif posX!=0 and posY==0: 				# elif against the ceiling...
-			tile.assign(posX,0,1)				# 	set and purge upper
-			if tile.array[posX-1][0][0]==0:		# 	if left's orientation is ULLR...
-				color.purge(posX-1,0,1)			# 		look left and purge upper
-			else:color.purge(posX-1,0,2)		# 	else look left and purge lower
-			tile.assign(posX,0,2)				# 	set and purge lower
-		else:									# else...
-			color.purge(posX,posY-1,2)			# 	look up and purge lower
-			tile.assign(posX,posY,1)			# 	set and purge upper
-			if tile.array[posX-1][posY][0]==0:	# 	if left's orientation is ULLR...
-				color.purge(posX-1,posY,1)		# 		look left and purge upper
-			else: color.purge(posX-1,posY,2)	#	else look left and purge lower
-			tile.assign(posX,posY,2)			# 	set and purge lower			
-	def urll(posX,posY):					# ORIENTATION 1 - URLL
-		tile.assign(posX,posY,2)				# set and purge lower
-		if posX==0 and posY!=0:					# if against the wall...
-			color.purge(0,posY-1,2)				# 	look up and purge lower
-			tile.assign(0,posY,1)				# 	set and purge lower
-		elif posX!=0 and posY==0:				# elif against the ceiling...
-			if tile.array[posX-1][posY][0]==0:	# 	if left's orientation is ULLR...
-				color.purge(posX-1,posY,1)		# 		look left and purge upper
-			else: color.purge(posX-1,posY,2)	# 	else look left and purge lower
-			tile.assign(posX,posY,1)			# 	set and purge upper
-		else: 									# else...
-			color.purge(posX,posY-1,2)			# 	look up and purge lower
-			if tile.array[posX-1][posY][0]==0:	# 	if left's orientation is ULLR...
-				color.purge(posX-1,posY,1)		# 		look left and purge upper
-			else: color.purge(posX-1,posY,2)	# 	else look left and purge lower
-			tile.assign(posX,posY,1)			# 	set and purge upper
-class tile:
+
+class tile:	# holds things relating to the cells and array layout
 	def assign(posX,posY,slot): # assigns a color to a tile then purges it from color.active
 		tile.array[posX][posY][slot]=choice(color.active)
 		color.purge(posX,posY,slot)
-	def setup(width,height):
-		tile.array=[]
+	def setup():	# initializes the array
+		# need to input catches for invalid entries and items not greater than 0
+		# BUILD VARIABLES
+		tile.aWidth=int(input("Enter grid width:\n?>> "))	# set array width to input
+		tile.aHeight=input("Enter grid height:\n?>> ")		# input array height input
+		if tile.aHeight=='':								# if array height is blank...
+			tile.aHeight=tile.aWidth						# 	set array height to array width
+		else:												# else...
+			tile.aHeight=int(tile.aHeight)					# 	set array height to integer
+		tile.size=int(input("What is the size of the square, in pixels?\n?>> "))	# set the size of the square
+		# BUILD ARRAY
 		# if argv.orient==0
-		# 	tile.array=[[[0,None,None] for x in range(height)] for x in range(width)]
+		# 	tile.array=[[[0,None,None] for x in range(tile.aHeight)] for x in range(tile.aWidth)]
 		# elif argv.orient==1
-		# 	tile.array=[[[1,None,None] for x in range(height)] for x in range(width)]
+		# 	tile.array=[[[1,None,None] for x in range(tile.aHeight)] for x in range(tile.aWidth)]
 		# elif argv.orient==2 OR argv.orient==None
-		tile.array=[[[rbit(1),None,None] for x in range(height)] for x in range(width)]
+		tile.array=[[[rbit(1),None,None] for x in range(tile.aHeight)] for x in range(tile.aWidth)]
+	def ullr(posX,posY):					# ORIENTATION 0 - ULLR
+		upper=1
+		lower=2
+		left=posX-1
+		up=posY-1
+		if posX==0 and posY!=0: 				# if against the wall...
+			tile.assign(0,posY,lower)			# 	set and purge lower
+			color.purge(0,up,lower)				# 	look up and purge uLower
+			tile.assign(0,posY,upper)			# 	set and purge upper
+		elif posX!=0 and posY==0: 				# elif against the ceiling...
+			tile.assign(posX,0,upper)			# 	set and purge upper
+			if tile.array[left][0][0]==0:		# 	if left's orientation is ULLR...
+				color.purge(left,0,upper)		# 		look left and purge lUpper
+			else:color.purge(left,0,lower)		# 	else look left and purge lLower
+			tile.assign(posX,0,lower)			# 	set and purge lower
+		else:									# else neither against wall or ceiling...
+			color.purge(posX,up,lower)			# 	look up and purge uLower
+			tile.assign(posX,posY,upper)		# 	set and purge upper
+			if tile.array[left][posY][0]==0:	# 	if left's orientation is ULLR...
+				color.purge(left,posY,upper)	# 		look left and purge lUpper
+			else: color.purge(left,posY,lower)	#	else look left and purge lLower
+			tile.assign(posX,posY,2)			# 	set and purge lower			
+	def urll(posX,posY):					# ORIENTATION 1 - URLL
+		upper=1
+		lower=2
+		left=left
+		up=posY-1
+		tile.assign(posX,posY,lower)			# set and purge lower
+		if posX==0 and posY!=0:					# if against the wall...
+			color.purge(0,up,lower)				# 	look up and purge uLower
+			tile.assign(0,posY,upper)			# 	set and purge upper
+		elif posX!=0 and posY==0:				# elif against the ceiling...
+			if tile.array[left][posY][0]==0:	# 	if left's orientation is ULLR...
+				color.purge(left,posY,upper)	# 		look left and purge lUpper
+			else: color.purge(left,posY,lower)	# 	else look left and purge lLower
+			tile.assign(posX,posY,upper)		# 	set and purge upper
+		else: 									# else against neither wall or ceiling...
+			color.purge(posX,up,lower)			# 	look up and purge uLower
+			if tile.array[left][posY][0]==0:	# 	if left's orientation is ULLR...
+				color.purge(left,posY,upper)	# 		look left and purge lUpper
+			else: color.purge(left,posY,lower)	# 	else look left and purge lLower
+			tile.assign(posX,posY,upper)		# 	set and purge upper
 def run():
-	# INITIALIZE VARIABLES
+	# INITIALIZE SYSTEM
 	color.setup()		# build color list
 	file=docSpec()		# set file to the name returned by docSpec
 	file.write(					# write to document a comment
@@ -90,42 +107,38 @@ def run():
 		%color.list+				# fill each line with each color
 		'-->\n'						# close the comment
 		'<svg>')					# open SVG and write to document
-	width=int(input("Enter grid width:\n?>> ")) # set array width to input
-	height=input("Enter grid height:\n?>> ")	# accept array height input
-	if height=='':height=width					# if height is empty set array height to width
-	else:height=int(height)						# else store input as integer
-	tile.setup(width,height)					# build empty array
+	tile.setup()					# build empty array
 	polyPath=(		# define the polygon write template
 		'\n\t<g>\n\t\t'+
 		'<polygon points="%s,%s %s,%s %s,%s" fill="#%s"/> '*2+
 		'\n\t</g>')
 	# RUN
-	for posX in range(width):	# build and write out the array
-		multX=10*posX			# set offset multiplier
-		for posY in range(height):
-			multY=10*posY
+	for posX in range(tile.aWidth):	# build and write out the array
+		multX=tile.size*posX			# set offset multiplier
+		for posY in range(tile.aHeight):
+			multY=tile.size*posY
 			color.reset() # COULD BUILD AN XLINK FOR (ULLR-(U|L)|URLL-(U|L) TO SHORTEN THE AMOUNT %s TO 3 PER ITER
 			if tile.array[posX][posY][0]==0:
-				lookup.ullr(posX,posY)			# fills array
+				tile.ullr(posX,posY)			# fills array
 				file.write(polyPath%(			# write to document
 					multX,multY,				# 	ULLR-U xy1
-					10+multX,multY,				# 	ULLR-U xy2
-					10+multX,10+multY,			# 	ULLR-U xy3
+					tile.size+multX,multY,			# 	ULLR-U xy2
+					tile.size+multX,tile.size+multY,	# 	ULLR-U xy3
 					tile.array[posX][posY][1],	# 	ULLR-U fill
 					multX,multY,				# 	ULLR-L xy1
-					10+multX,10+multY,			# 	ULLR-L xy2
-					multX,10+multY,				# 	ULLR-L xy3
+					tile.size+multX,tile.size+multY,	# 	ULLR-L xy2
+					multX,tile.size+multY,			# 	ULLR-L xy3
 					tile.array[posX][posY][2]))	# 	ULLR-L fill
 			else:
-				lookup.urll(posX,posY)			# fills array
+				tile.urll(posX,posY)			# fills array
 				file.write(polyPath%(			# write to document
 					multX,multY,				# 	URLL-U xy1
-					10+multX,multY,				# 	URLL-U xy2 
-					multX,10+multY,				# 	URLL-U xy3
+					tile.size+multX,multY,			# 	URLL-U xy2 
+					multX,tile.size+multY,			# 	URLL-U xy3
 					tile.array[posX][posY][1],	# 	URLL-U fill
-					10+multX,multY,				# 	URLL-L xy1
-					10+multX,10+multY,			# 	URLL-L xy2
-					multX,10+multY,				# 	URLL-L xy3
+					tile.size+multX,multY,			# 	URLL-L xy1
+					tile.size+multX,tile.size+multY,	# 	URLL-L xy2
+					multX,tile.size+multY,			# 	URLL-L xy3
 					tile.array[posX][posY][2]))	# 	URLL-L fill
 	file.write('</svg>')	# write to document svg element closing
 	file.close()			# close document

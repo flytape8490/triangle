@@ -1,1 +1,4 @@
-A little python script i wrote to spit out triangles because why the fuck not?
+A script that generates a randomized array of colored triangles.
+
+Project inspired by my friend Brad's totally not-gay fascination
+with these patterns. 

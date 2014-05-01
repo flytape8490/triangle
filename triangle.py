@@ -35,7 +35,7 @@ def argue(): # build arguments and their parser (help is cookbook section 13.3-p
 		action='store',
 		choices={'left','up','both','internal','all'},	# this could be more elegant
 		help='Disable adjacency checking for specific directions. If unspecified, default behavior is to prevent adjacent color duplication.')
-	parser.add_argument(	# -svg (d)ocument (h)eight - UNIMPLEMENTED (might want to remove the default?
+	parser.add_argument(	# -svg (d)ocument (h)eight
 		'-dh',
 		dest='dHeight',
 		metavar='Document Height',
@@ -43,7 +43,7 @@ def argue(): # build arguments and their parser (help is cookbook section 13.3-p
 		type=int,
 		default=100,
 		help='Sets the height of the SVG document. The default value is 100.')
-	parser.add_argument(	# -svg (d)ocument (w)idth - UNIMPLEMENTED
+	parser.add_argument(	# -svg (d)ocument (w)idth
 		'-dw',
 		dest='dWidth',
 		metavar='Document Width',
@@ -82,14 +82,14 @@ class color: # holds color functions
 	def reset(): color.active=set(color.master) # initializes color.active by copying color.master as a set
 	def setup():				# initializes color.master
 		color.master=set({})	# build empty set (set doesn't support duplicates)
-		print(	# not a """ string because that holds the whitespace. Split into separate lines anyway because of readability
+		print(	# not a """ string because those preserve whitespace. Split into separate lines anyway because of readability
 			'Please input at least four colors in standard\n'
 			'3 or 6 character HEX format (excluding #).\n'
 			'When you are complete, please enter 0.')
 		while True:							# start the input loop
 			i=input('?>> ')						# input string
-			if i==str(0) or i=='':				# if input is 0 or blank
-				if len(color.master)>=4:	break	# 	if master has at least 4 items, exit loop
+			if i==str(0) or i=='':				# if input is 0 or blank...
+				if len(color.master)>=4: break	# 	if master has at least 4 items, exit loop
 				else: print('At least four colors are needed.')	# 	else, alert too few colors
 			else: color.master.add(i)			# else, add the color to the master
 		color.master=tuple(color.master)	# store color.master as a tuple
@@ -169,10 +169,11 @@ def run(): # actually builds and writes the array
 		'\n\t</g>')												# 	close group tag
 	file.write(				# build SVG tag, comment the color list
 		'<svg '+				# 	open SVG tag
-		'width="%s" '			#		sets width, with format slot
+		'widt
+		h="%s" '			#		sets width, with format slot
 		'height="%s"\n\t'		#		sets height, with format slot
 		%(argv.dWidth, argv.dHeight)+# 	applies format
-		'xmlns="http://www.w3.org/2000/svg">\n'# writes out the xmlns and closes the svg tag
+		'xmlns="http://www.w3.org/2000/svg">\n'# writes out the xmlns and ends the svg tag
 		'<!--\n'+				# 	opens a comment tag
 		'%s\n'*len(color.master)# 	build a new line for each color, with format slots
 			%color.master+		# 		fill the format slots
@@ -212,7 +213,6 @@ tile.setup()		# set up all dimensional variables, build array
 color.setup()		# build color lists
 file=docSpec()		# open a file for writing
 run()				# start the builder
-
 # TO DO LIST:
 #	Move to SVG symbols, see if it runs faster or makes smaller files
 # 	Build and implement cell scaling arguments and argument priority overrides
@@ -224,3 +224,4 @@ run()				# start the builder
 #	Build and implement Palette path argv
 #	Add a -svgz argv to make it a .svgz
 #	Validate color input items hexPat=re.compile('((\d|[a-f]){3}){,2}',re.I)
+#	could make this whole thing tileable by adding right wall and floor lookup events

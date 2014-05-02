@@ -169,8 +169,7 @@ def run(): # actually builds and writes the array
 		'\n\t</g>')												# 	close group tag
 	file.write(				# build SVG tag, comment the color list
 		'<svg '+				# 	open SVG tag
-		'widt
-		h="%s" '			#		sets width, with format slot
+		'width="%s" '			#		sets width, with format slot
 		'height="%s"\n\t'		#		sets height, with format slot
 		%(argv.dWidth, argv.dHeight)+# 	applies format
 		'xmlns="http://www.w3.org/2000/svg">\n'# writes out the xmlns and ends the svg tag
